@@ -29,6 +29,7 @@ const server = createServer((req, res) => {
         await page.route('**/mastery.js*', route => route.abort());
         await page.clock.install();
         await page.goto(url);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
         assert.equal(await page.locator('#map td').count(),64);
         await page.locator('#soundBtn').click();
         await page.locator('[data-n="all"]').click();
@@ -70,15 +71,43 @@ const server = createServer((req, res) => {
         assert.equal(await page.locator('#map td').count(),64);
         assert.equal(await page.locator('#fixBtn').isVisible(),true);
 
-        // Star ranks are independent of knowledge; check every boundary.
-        for (const [stars, name] of [[0,'Искра'],[4,'Искра'],[5,'На разгоне'],[14,'На разгоне'],[15,'Турбо'],[29,'Турбо'],[30,'Босс умножения'],[59,'Босс умножения'],[60,'Легенда']]) {
+        // Star ranks are independent of knowledge; check every boundary and the visible journey.
+        for (const [stars, name, position] of [
+          [0,'Искра',1],[4,'Искра',1],[5,'На разгоне',2],[14,'На разгоне',2],
+          [15,'Турбо',3],[29,'Турбо',3],[30,'Босс умножения',4],[59,'Босс умножения',4],
+          [60,'Легенда',5],[99,'Легенда',5],[100,'Сверхзвезда',6],[159,'Сверхзвезда',6],
+          [160,'Герой галактики',7],[249,'Герой галактики',7],[250,'Чемпион вселенной',8]
+        ]) {
           await page.evaluate(stars => localStorage.setItem('umnozhayka-v1', JSON.stringify({stars,sound:false})), stars);
           await page.reload();
           assert.equal(await page.locator('#rankName').innerText(), name);
+          assert.equal(await page.locator('#rankPosition').innerText(), String(position));
+          assert.equal(await page.locator('#rankTotal').innerText(), '8');
+          assert.equal(await page.locator('#rankJourney .rank-step').count(), 8);
+          assert.equal(await page.locator('#rankJourney .rank-step.current').count(), 1);
+          assert.equal(await page.locator('#rankJourney .rank-step.current strong').innerText(), name);
           assert.equal(await page.locator('#masteryTitle').innerText(), 'Освоено 0 из 64');
           assert.equal(await page.locator('#masteryScore').innerText(), '0');
           assert.equal(await page.locator('#map td').count(), 64);
         }
+
+        // Crossing a boundary must reveal a clear reward, not only change a label in the menu.
+        await page.evaluate(() => localStorage.setItem('umnozhayka-v1', JSON.stringify({stars:4,sound:false})));
+        await page.reload();
+        await page.locator('#goBtn').click();
+        await page.clock.runFor(2500);
+        for (let i = 0; i < 8; i++) {
+          const value = Number(await page.locator('#qa').innerText()) * Number(await page.locator('#qb').innerText());
+          for (const digit of String(value)) await page.locator('[data-k="'+digit+'"]').click();
+          await page.clock.runFor(250);
+        }
+        await page.clock.runFor(60000);
+        assert.equal(await page.locator('#result').isVisible(), true);
+        assert.equal(await page.locator('#newRank').innerText(), 'Новое звание: На разгоне');
+        assert.equal(await page.locator('#rankUnlock').isVisible(), true);
+        assert.equal(await page.locator('#rankUnlockName').innerText(), 'На разгоне');
+        assert.equal(await page.locator('#rankUnlockIcon').innerText(), '🚀');
+
         await page.evaluate(() => {
           const stats = {};
           for (let a=2;a<=9;a++) for(let b=2;b<=9;b++)

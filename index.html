@@ -112,13 +112,42 @@
   }
 
   /* ---------- player ---------- */
-  .player { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; }
+  .player { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; overflow: hidden; }
+  .rank-title { display: flex; align-items: center; gap: 8px; }
+  .rank-icon { font-size: 28px; line-height: 1; filter: drop-shadow(0 2px 0 color-mix(in srgb, var(--ink) 18%, transparent)); }
   .rank-name { font-family: var(--display); font-weight: 700; font-size: 20px; }
+  .rank-position { grid-column: 1 / -1; font-size: 13px; color: var(--muted); font-weight: 700; }
   .stars-total { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--ink); }
   .stars-total .st { color: var(--marker); -webkit-text-stroke: 1px var(--marker-ink); }
   .lvl-bar { grid-column: 1 / -1; height: 10px; border-radius: 99px; background: var(--new); overflow: hidden; }
   .lvl-bar i { display: block; height: 100%; width: 0; background: var(--marker); border-radius: 99px; transition: width .6s ease; }
   .lvl-next { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+  .rank-journey {
+    grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px; list-style: none; margin: 6px 0 4px; padding: 0;
+  }
+  .rank-step {
+    position: relative; min-width: 0; min-height: 78px; padding: 8px 4px 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    border: 2px solid var(--line); border-radius: 13px; background: var(--new);
+    color: var(--muted); text-align: center;
+  }
+  .rank-step::after {
+    content: ''; position: absolute; left: 100%; top: 24px; width: 10px;
+    border-top: 3px dotted var(--line); z-index: 1;
+  }
+  .rank-step:nth-child(4n)::after, .rank-step:last-child::after { display: none; }
+  .rank-step .ri { font-size: 21px; line-height: 1; filter: grayscale(1); opacity: .48; }
+  .rank-step strong { max-width: 100%; font-size: 10px; line-height: 1.15; overflow-wrap: anywhere; }
+  .rank-step small { font-size: 10px; font-weight: 800; }
+  .rank-step.reached { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 45%, var(--line)); color: var(--green); }
+  .rank-step.reached .ri { filter: none; opacity: 1; }
+  .rank-step.current {
+    background: var(--marker); border-color: var(--marker-ink); color: var(--marker-ink);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--marker) 30%, transparent);
+    transform: translateY(-2px);
+  }
+  .rank-step.current .ri { filter: none; opacity: 1; transform: scale(1.15); }
   .best { grid-column: 1 / -1; display: flex; justify-content: space-between; border-top: 2px dashed var(--line); padding-top: 10px; margin-top: 4px; font-weight: 700; }
   .best b { font-family: var(--display); font-variant-numeric: tabular-nums; }
 
@@ -264,6 +293,15 @@
   .rscore b { font-family: var(--display); font-size: 40px; color: var(--ink); display: block; line-height: 1.1; font-variant-numeric: tabular-nums; }
   .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .badge { background: var(--marker); color: var(--marker-ink); font-weight: 800; padding: 6px 12px; border-radius: 99px; font-size: 14px; }
+  .rank-unlock {
+    width: 100%; margin-top: 8px; padding: 14px 12px; border: 3px solid var(--marker-ink);
+    border-radius: 18px; background: linear-gradient(135deg, var(--marker), var(--yellow-soft));
+    color: var(--marker-ink); box-shadow: 0 6px 0 color-mix(in srgb, var(--marker-ink) 28%, transparent);
+  }
+  .rank-unlock-icon { display: block; font-size: 54px; line-height: 1; animation: rank-pop .8s cubic-bezier(.2,.9,.2,1.25); }
+  .rank-unlock .label { color: inherit; opacity: .75; margin-top: 5px; }
+  .rank-unlock-name { font-family: var(--display); font-weight: 800; font-size: 21px; margin-top: 2px; }
+  .rank-unlock-motto { font-weight: 800; margin-top: 3px; }
   .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 0; }
   .stats div { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; }
   .stats dt { font-size: 13px; color: var(--muted); font-weight: 700; }
@@ -291,6 +329,12 @@
   @keyframes pop { 0% { transform: scale(.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
   @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-10px); } 40% { transform: translateX(9px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(4px); } }
   @keyframes rise { 0% { opacity: 0; transform: translateY(8px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-26px); } }
+  @keyframes rank-pop { 0% { transform: scale(.2) rotate(-20deg); } 55% { transform: scale(1.35) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+  @media (max-width: 370px) {
+    .rank-journey { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+    .rank-step { min-height: 72px; padding-inline: 2px; }
+    .rank-step::after { width: 7px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
@@ -308,11 +352,13 @@
     <div class="card player">
       <div>
         <div class="label">Звание за звёзды</div>
-        <div class="rank-name" id="rankName">Искра</div>
+        <div class="rank-title"><span class="rank-icon" id="rankIcon" aria-hidden="true">✦</span><div class="rank-name" id="rankName">Искра</div></div>
       </div>
       <div class="stars-total"><span class="st">★</span> <span id="starsTotal">0</span></div>
       <div class="lvl-bar"><i id="lvlFill"></i></div>
       <p class="lvl-next" id="lvlNext"></p>
+      <p class="rank-position">Твой путь: этап <b id="rankPosition">1</b> из <b id="rankTotal">8</b></p>
+      <ol class="rank-journey" id="rankJourney" aria-label="Путь званий"></ol>
       <div class="best"><span>Рекорд</span><span><b id="best">0</b> очков</span></div>
     </div>
 
@@ -391,6 +437,12 @@
         <span class="badge" id="newBest" hidden>Новый рекорд!</span>
         <span class="badge" id="newRank" hidden></span>
         <span class="badge mastery-badge" id="masteryResult"></span>
+      </div>
+      <div class="rank-unlock" id="rankUnlock" hidden aria-live="polite">
+        <span class="rank-unlock-icon" id="rankUnlockIcon" aria-hidden="true"></span>
+        <div class="label">Открыто новое звание</div>
+        <div class="rank-unlock-name" id="rankUnlockName"></div>
+        <p class="rank-unlock-motto" id="rankUnlockMotto"></p>
       </div>
     </div>
 
@@ -549,7 +601,16 @@
   const KEY = 'umnozhayka-v1';
   const NUMS = [2, 3, 4, 5, 6, 7, 8, 9];
   const ROUND_MS = 60000;
-  const LEVELS = [[0, 'Искра'], [5, 'На разгоне'], [15, 'Турбо'], [30, 'Босс умножения'], [60, 'Легенда']];
+  const RANKS = [
+    { min: 0, name: 'Искра', icon: '✦', effect: 'spark', motto: 'Всё начинается с первой искры!' },
+    { min: 5, name: 'На разгоне', icon: '🚀', effect: 'rush', motto: 'Двигатели запущены!' },
+    { min: 15, name: 'Турбо', icon: '🔥', effect: 'rise', motto: 'Вот это скорость!' },
+    { min: 30, name: 'Босс умножения', icon: '👑', effect: 'burst', motto: 'Таблица знает, кто здесь босс!' },
+    { min: 60, name: 'Легенда', icon: '🌟', effect: 'shower', motto: 'О тебе уже слагают легенды!' },
+    { min: 100, name: 'Сверхзвезда', icon: '☄️', effect: 'comet', motto: 'Твой результат видно из космоса!' },
+    { min: 160, name: 'Герой галактики', icon: '🪐', effect: 'orbit', motto: 'Целая галактика гордится тобой!' },
+    { min: 250, name: 'Чемпион вселенной', icon: '🏆', effect: 'finale', motto: 'Вершина покорена. Ты — чемпион!' },
+  ];
   const $ = (id) => document.getElementById(id);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const calculateMastery = window.Mastery.calculate;
@@ -620,7 +681,7 @@
 
   function levelOf(stars) {
     let i = 0;
-    LEVELS.forEach(([min], j) => { if (stars >= min) i = j; });
+    RANKS.forEach((rank, j) => { if (stars >= rank.min) i = j; });
     return i;
   }
 
@@ -650,6 +711,7 @@
     tick() { tone(1200, 0.05, 'sine', 0, 0.07); },
     go() { tone(880, 0.25, 'triangle', 0, 0.16); },
     end() { [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.22, 'triangle', i * 0.11)); },
+    rank() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.28, i % 2 ? 'sine' : 'triangle', i * 0.1, 0.18)); },
   };
   function buzz(p) { if (!S.sound) return; try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
 
@@ -696,9 +758,19 @@
 
   function renderStart() {
     const li = levelOf(S.stars);
-    $('rankName').textContent = LEVELS[li][1];
+    const rank = RANKS[li];
+    $('rankName').textContent = rank.name;
+    $('rankIcon').textContent = rank.icon;
     $('starsTotal').textContent = S.stars;
     $('best').textContent = S.best;
+    $('rankPosition').textContent = li + 1;
+    $('rankTotal').textContent = RANKS.length;
+    $('rankJourney').innerHTML = RANKS.map((item, index) => {
+      const state = index < li ? 'reached' : index === li ? 'current' : 'future';
+      const label = index === li ? 'Текущее звание' : index < li ? 'Получено' : `Нужно ${item.min} звёзд`;
+      return `<li class="rank-step ${state}" aria-label="${item.name}: ${label}"${index === li ? ' aria-current="step"' : ''}>` +
+        `<span class="ri" aria-hidden="true">${item.icon}</span><strong>${item.name}</strong><small>${item.min} ★</small></li>`;
+    }).join('');
 
     const knowledge = calculateMastery(S.stats);
     $('masteryTitle').textContent = `Освоено ${knowledge.masteredCount} из ${knowledge.total}`;
@@ -714,13 +786,13 @@
         ? `Следующая цель: <b>${knowledge.weak.slice(0, 3).map((x) => fmt(x.key) + ' — ' + window.Mastery.streak(S.stats[x.key]) + '/' + window.Mastery.REQUIRED).join(', ')}</b>`
         : 'Продолжай отвечать быстро и без ошибок.';
 
-    if (li < LEVELS.length - 1) {
-      const [from] = LEVELS[li], [to, name] = LEVELS[li + 1];
+    if (li < RANKS.length - 1) {
+      const from = RANKS[li].min, { min: to, name } = RANKS[li + 1];
       $('lvlFill').style.width = Math.round((S.stars - from) / (to - from) * 100) + '%';
       $('lvlNext').textContent = `До звания «${name}» — ещё ${to - S.stars} ★`;
     } else {
       $('lvlFill').style.width = '100%';
-      $('lvlNext').textContent = 'Высшее звание! Продолжай бить рекорды.';
+      $('lvlNext').textContent = `Все ${RANKS.length} званий открыты! Теперь ставь личные рекорды.`;
     }
     $('soundBtn').textContent = S.sound ? 'Звук: вкл' : 'Звук: выкл';
     $('soundBtn').setAttribute('aria-pressed', S.sound);
@@ -943,8 +1015,16 @@
     $('rstars').innerHTML = [0, 1, 2].map((i) => `<span class="${i < stars ? 'on' : ''}">★</span>`).join('');
     $('rScore').textContent = R.score;
     $('newBest').hidden = !newBest;
-    $('newRank').hidden = levelNow <= R.levelBefore;
-    $('newRank').textContent = `Новое звание: ${LEVELS[levelNow][1]}`;
+    const rankUnlocked = levelNow > R.levelBefore;
+    const unlockedRank = RANKS[levelNow];
+    $('newRank').hidden = !rankUnlocked;
+    $('newRank').textContent = `Новое звание: ${unlockedRank.name}`;
+    $('rankUnlock').hidden = !rankUnlocked;
+    if (rankUnlocked) {
+      $('rankUnlockIcon').textContent = unlockedRank.icon;
+      $('rankUnlockName').textContent = unlockedRank.name;
+      $('rankUnlockMotto').textContent = unlockedRank.motto;
+    }
     $('rOk').textContent = R.correct;
     $('rBad').textContent = R.wrong;
     $('rAcc').textContent = acc + '%';
@@ -969,8 +1049,13 @@
     $('hard').innerHTML = hard.map((k) => `<span>${fmt(k)}</span>`).join('');
 
     show('result');
-    SFX.end();
-    if ((newBest && R.score > 0) || stars === 3) confetti();
+    if (rankUnlocked) {
+      SFX.rank();
+      celebrateRank(unlockedRank);
+    } else {
+      SFX.end();
+      if ((newBest && R.score > 0) || stars === 3) confetti();
+    }
   }
 
   function quit() {
@@ -1009,7 +1094,68 @@
   $('againBtn').addEventListener('click', () => startRound(R ? R.mode : 'normal'));
   $('menuBtn').addEventListener('click', () => { renderStart(); show('start'); });
 
-  // ---------- confetti ----------
+  // ---------- celebrations ----------
+  function celebrateRank(rank) {
+    if (reduced) return;
+    const cv = $('confetti');
+    cv.hidden = false;
+    const ctx = cv.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+    const amount = rank.effect === 'finale' ? 72 : 46;
+    const parts = Array.from({ length: amount }, (_, i) => {
+      const angle = Math.PI * 2 * i / amount + Math.random() * .25;
+      return {
+        x: W * .5, y: H * .45, angle, phase: Math.random() * Math.PI * 2,
+        vx: Math.cos(angle) * (2 + Math.random() * 5) * dpr,
+        vy: Math.sin(angle) * (2 + Math.random() * 5) * dpr,
+        size: (18 + Math.random() * 18) * dpr,
+        spin: (Math.random() - .5) * .16, rotation: Math.random() * 2,
+      };
+    });
+    const t0 = performance.now();
+    (function frame(now) {
+      const elapsed = now - t0;
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach((p, i) => {
+        if (rank.effect === 'rush') {
+          p.x = ((elapsed * (0.55 + i % 5 * .08) * dpr + i * W / amount) % (W + 100 * dpr)) - 50 * dpr;
+          p.y = H * (.12 + (i % 8) * .105);
+        } else if (rank.effect === 'rise') {
+          p.x += Math.sin(elapsed / 180 + p.phase) * .8 * dpr;
+          p.y -= (1.4 + i % 5 * .3) * dpr;
+          if (p.y < -50 * dpr) p.y = H + 30 * dpr;
+        } else if (rank.effect === 'shower') {
+          p.x = (i * W / amount + Math.sin(elapsed / 250 + p.phase) * 30 * dpr) % W;
+          p.y = ((elapsed * (.25 + i % 4 * .06) * dpr + i * 37 * dpr) % (H + 80 * dpr)) - 40 * dpr;
+        } else if (rank.effect === 'comet') {
+          p.x += (2.5 + i % 5 * .4) * dpr;
+          p.y += (1.2 + i % 3 * .3) * dpr;
+          if (p.x > W + 50 * dpr || p.y > H + 50 * dpr) { p.x = -50 * dpr; p.y = -Math.random() * H * .4; }
+        } else if (rank.effect === 'orbit') {
+          const radius = (70 + (i % 7) * 28 + elapsed * .025) * dpr;
+          const a = p.angle + elapsed * (.0007 + (i % 3) * .0002);
+          p.x = W * .5 + Math.cos(a) * radius;
+          p.y = H * .45 + Math.sin(a) * radius * .52;
+        } else {
+          p.x += p.vx; p.y += p.vy;
+          p.vy += (rank.effect === 'spark' ? .035 : .055) * dpr;
+          if (rank.effect === 'finale' && elapsed > 900) p.vx *= 1.006;
+        }
+        p.rotation += p.spin;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, elapsed < 350 ? elapsed / 350 : (3000 - elapsed) / 650));
+        ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
+        ctx.font = `${p.size}px system-ui, sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(rank.icon, 0, 0);
+        ctx.restore();
+      });
+      if (elapsed < 3000) requestAnimationFrame(frame);
+      else { ctx.clearRect(0, 0, W, H); cv.hidden = true; }
+    })(t0);
+  }
+
   function confetti() {
     if (reduced) return;
     const cv = $('confetti');

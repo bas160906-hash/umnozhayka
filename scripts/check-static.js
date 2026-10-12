@@ -15,6 +15,10 @@ requireFile('mastery.js');
   'id="masteryFill"',
   'id="masteryDetail"',
   'id="masteryFocus"',
+  'id="rankJourney"',
+  'id="rankPosition"',
+  'id="rankUnlock"',
+  'function celebrateRank(rank)',
   '<script id="mastery-code">',
 ].forEach((marker) => {
   if (!index.includes(marker)) throw new Error('index.html is missing: ' + marker);
